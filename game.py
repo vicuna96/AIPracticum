@@ -4,6 +4,9 @@ from dateutil.relativedelta import relativedelta
 from termcolor import colored
 
 rand_article_url = 'https://en.wikipedia.org/wiki/Special:Random'
+base_url = 'https://en.wikipedia.org/wiki/'
+prefix_url = '<a href="/wiki/'
+canonical_url = '<link rel="canonical" href="https://en.wikipedia.org/wiki/'
 
 class ArticleSearch:
     def __init__(self, title: str, parent = None):

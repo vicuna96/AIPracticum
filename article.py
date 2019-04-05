@@ -1,3 +1,4 @@
+
 class Article(object):
     """ A Wikipedia Article.
 
@@ -6,14 +7,17 @@ class Article(object):
         __outLinks[article list]:   all the articles mentioned in the current article
         __contents[string]:         The text contained in the Wikipedia article
         __topWords[string list]     A list of the most meaningful words using the [] metric
+        visited[boolean]:
     """
 
-    def __init__(self, link, hyperlinks, contents, topWords):
+    def __init__(self, id, link, hyperlinks, contents, topWords):
         """Return a new Article object."""
+        self.__id = id
         self.__url = link
-        self.__hyperlinks = hyperlinks
+        self.__outLinks = hyperlinks
         self.__contents = contents
         self.__topWords = topWords
+        self.visited = False
 
     def getUrl(self):
         """ Returns the [url] where this Wikipedia article can be found. """
@@ -28,3 +32,5 @@ class Article(object):
         """ Returns a list of Articles that are linked to in this article through hyperlinks."""
         return self.__outLinks
 
+    def getId(self):
+        return self.__id
