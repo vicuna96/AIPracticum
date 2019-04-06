@@ -10,13 +10,14 @@ class Article(object):
         visited[boolean]:
     """
 
-    def __init__(self, id, link, hyperlinks, contents, topWords):
+    def __init__(self, id, link, hyperlinks, title, contents, topWords):
         """Return a new Article object."""
         self.__id = id
         self.__url = link
         self.__outLinks = hyperlinks
         self.__contents = contents
         self.__topWords = topWords
+        self.__title = title
         self.visited = False
 
     def getUrl(self):
@@ -34,3 +35,6 @@ class Article(object):
 
     def getId(self):
         return self.__id
+
+    def getTitle(self):
+        return self.__title
