@@ -3,15 +3,21 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from termcolor import colored
 from random import random
+import build_graph
 
 rand_article_url = 'https://en.wikipedia.org/wiki/Special:Random'
 base_url = 'https://en.wikipedia.org/wiki/'
 prefix_url = '<a href="/wiki/'
 canonical_url = '<link rel="canonical" href="https://en.wikipedia.org/wiki/'
 
+tree = ET.parse('wikipedia-051105-preprocessed/20051105_pages_articles.hgw.xml')
+root = tree.getroot()
+
+
 class ArticleSearch:
-    def __init__(self, title: str, parent = None, relevance = 0):
-        self.title = title
+    def __init__(self, id_number: str, parent = None, relevance = 0):
+        self.id_number = id_number
+        self.title = #get title from id
         self.parent = parent
         self.relevance = relevance
     def get_title(self):
@@ -19,6 +25,7 @@ class ArticleSearch:
     def get_parent(self):
         return self.parent
 
+"""
 #NOT used for priority beam search
 def get_links_from_contents(article_contents):
     links = []
@@ -134,35 +141,38 @@ def itdeep_search(start, end):
         if found is not None:
             return found
         d += 1
+"""
 
 #Priority beam search function
-def priority_beam_search(start, end, width):
+def priority_beam_search(start_id, end_id, width):
+        start = ArticleSearch(start_id)
+        end = ArticleSearch(end_id)
         discovered = []
         S = [start]
-        discovered.append(start.title)
+        discovered.append(start_id)
         while len(S) != 0:
             v = S[0]
             S = S[1:]
-            if v.title == end.title:
+            if v.id_number == end_id:
                 print_lineage(v)
                 return
-            curr_links = get_top_links(v, end, width)
+            curr_links = build_graph.links_by_cosim(root, v.id_number)
             print('currently checking children of', v.title)
-            #print(curr_links)
-            for l in curr_links:
-                if l.title not in discovered:
-                    discovered.append(l.title)
-                    if l.title == end.title:
-                        l_article = ArticleSearch(l.title, parent = v)
+            for i in range(width):
+                l = curr_links[i]
+                if l.id_number not in discovered:
+                    discovered.append(l.id_number)
+                    if l.id_number == end_id:
+                        l_article = ArticleSearch(l.id_number, parent = v)
                         print_lineage(l_article)
                         return
-                    l_article = ArticleSearch(l.title, parent = v)
+                    l_article = ArticleSearch(l.id_number, parent = v)
                     S.append(l_article)
 
 
 
 
-
+"""
 def time_taken(start_time, end_time):
     time_dif = relativedelta(end_time, start_time)
     print('This search took %d minutes, %d.%d seconds' % (time_dif.minutes, time_dif.seconds, time_dif.microseconds))
@@ -184,7 +194,7 @@ def prompt_step(current, goal):
 
     prompt_step(ArticleSearch(next_link, parent = current), goal)
 
-
+"""
 
 
 def play_game():
@@ -206,7 +216,7 @@ def play_game():
 
     prompt_step(start_article, end_article)
 
-
+"""
 
 #play_game()
 
@@ -218,19 +228,18 @@ aicenter_article = ArticleSearch('Artificial_Intelligence_Center')
 vertical_bar_article = ArticleSearch('Vertical_bar')
 cornell_article = ArticleSearch('Cornell_University')
 
-"""
 s = datetime.now()
 itdeep_search(bfs_article, baltimore_article)
 e = datetime.now()
 time_taken(s, e)
-"""
+
 
 s = datetime.now()
 priority_beam_search(bfs_article, baltimore_article, 5)
 e = datetime.now()
 time_taken(s, e)
 
-"""
+
 start_time = datetime.now()
 bfs_search(bfs_article, cornell_article)
 end_time = datetime.now()
