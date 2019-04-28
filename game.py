@@ -2,6 +2,7 @@ import urllib.request
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from termcolor import colored
+from random import random
 
 rand_article_url = 'https://en.wikipedia.org/wiki/Special:Random'
 base_url = 'https://en.wikipedia.org/wiki/'
@@ -9,15 +10,16 @@ prefix_url = '<a href="/wiki/'
 canonical_url = '<link rel="canonical" href="https://en.wikipedia.org/wiki/'
 
 class ArticleSearch:
-    def __init__(self, title: str, parent = None):
+    def __init__(self, title: str, parent = None, relevance = 0):
         self.title = title
         self.parent = parent
+        self.relevance = relevance
     def get_title(self):
         return self.title
     def get_parent(self):
         return self.parent
 
-
+#NOT used for priority beam search
 def get_links_from_contents(article_contents):
     links = []
     index = article_contents.find('<a href="/wiki/')
@@ -29,11 +31,49 @@ def get_links_from_contents(article_contents):
         shortened_article = shortened_article[index+15:]
     return links
 
+#NOT used for priority beam search
 def get_links(article):
     #print('title', article.title)
     article_url = 'https://en.wikipedia.org/wiki/' + article.title
     article_contents = (urllib.request.urlopen(article_url).read(100000000)).decode('utf-8')
     return get_links_from_contents(article_contents)
+
+#Used for priority beam search
+def get_relevance(article_title, goal):
+    #TODO: urrently unimplemented
+    return random()
+
+#Used for priority beam search
+def insert_article(l, a, n):
+    if len(l) == 0:
+        l.append(a)
+    for i in range(len(l)):
+        if a.relevance > l[i].relevance:
+            l.insert(i-1, a)
+            break
+    if len(l) > n:
+        del l[-1]
+
+#Used for priority beam search
+def get_top_links_from_contents(article_contents, goal, n):
+    links = []
+    index = article_contents.find('<a href="/wiki/')
+    shortened_article = article_contents[index+15:]
+    while index >= 0:
+        title = shortened_article[:shortened_article.index('"')]
+        rel = get_relevance(title, goal)
+        insert_article(links, ArticleSearch(title, relevance = rel), n)
+        index = shortened_article.find('<a href="/wiki/')
+        shortened_article = shortened_article[index+15:]
+    # for l in links:
+    #     print(l.title)
+    return links
+
+#Used for priority beam search
+def get_top_links(article, goal, n):
+    article_url = 'https://en.wikipedia.org/wiki/' + article.title
+    article_contents = (urllib.request.urlopen(article_url).read(100000000)).decode('utf-8')
+    return get_top_links_from_contents(article_contents, goal, n)
 
 def print_lineage(end):
     lineage = []
@@ -43,6 +83,7 @@ def print_lineage(end):
     lineage.reverse()
     print('lineage:', lineage)
 
+#NOT used for priority beam search
 def bfs_search(start, end):
     S = []
     discovered = []
@@ -68,21 +109,23 @@ def bfs_search(start, end):
                 l_article = ArticleSearch(l, parent = v)
                 S.append(l_article)
 
+#NOT used for priority beam search
 def limited_dfs(node, goal, depth):
     if depth == 0:
-        if node.get_title() == goal.get_title():
+        if node.title == goal.title:
             return node
         else:
             return None
     #print('currently checking children of', node.get_title())
     for l in get_links(node):
-        if l == goal.get_title():
+        if l == goal.title:
             print_lineage(ArticleSearch(l, parent = node))
         found = limited_dfs(ArticleSearch(l, parent = node), goal, depth-1)
         if found is not None:
             return found
     return None
 
+#NOT used for priority beam search
 def itdeep_search(start, end):
     d = 0
     while True:
@@ -91,6 +134,34 @@ def itdeep_search(start, end):
         if found is not None:
             return found
         d += 1
+
+#Priority beam search function
+def priority_beam_search(start, end, width):
+        discovered = []
+        S = [start]
+        discovered.append(start.title)
+        while len(S) != 0:
+            v = S[0]
+            S = S[1:]
+            if v.title == end.title:
+                print_lineage(v)
+                return
+            curr_links = get_top_links(v, end, width)
+            print('currently checking children of', v.title)
+            #print(curr_links)
+            for l in curr_links:
+                if l.title not in discovered:
+                    discovered.append(l.title)
+                    if l.title == end.title:
+                        l_article = ArticleSearch(l.title, parent = v)
+                        print_lineage(l_article)
+                        return
+                    l_article = ArticleSearch(l.title, parent = v)
+                    S.append(l_article)
+
+
+
+
 
 def time_taken(start_time, end_time):
     time_dif = relativedelta(end_time, start_time)
@@ -137,7 +208,7 @@ def play_game():
 
 
 
-play_game()
+#play_game()
 
 bfs_article = ArticleSearch('Breadth-first_search')
 algorithm_article = ArticleSearch('Algorithm')
@@ -152,7 +223,14 @@ s = datetime.now()
 itdeep_search(bfs_article, baltimore_article)
 e = datetime.now()
 time_taken(s, e)
+"""
 
+s = datetime.now()
+priority_beam_search(bfs_article, baltimore_article, 5)
+e = datetime.now()
+time_taken(s, e)
+
+"""
 start_time = datetime.now()
 bfs_search(bfs_article, cornell_article)
 end_time = datetime.now()
