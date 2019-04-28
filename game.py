@@ -145,6 +145,7 @@ def itdeep_search(start, end):
 
 #Priority beam search function
 def priority_beam_search(start_id, end_id, width):
+        total_checked = 0
         start = ArticleSearch(start_id)
         end = ArticleSearch(end_id)
         discovered = []
@@ -161,10 +162,12 @@ def priority_beam_search(start_id, end_id, width):
             for i in range(width):
                 l = curr_links[i]
                 if l.id_number not in discovered:
+                    total_checked += 1
                     discovered.append(l.id_number)
                     if l.id_number == end_id:
                         l_article = ArticleSearch(l.id_number, parent = v)
                         print_lineage(l_article)
+                        print('Total checked:', total_checked)
                         return
                     l_article = ArticleSearch(l.id_number, parent = v)
                     S.append(l_article)
