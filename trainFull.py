@@ -14,13 +14,16 @@ class TaggedWikiDocument(object):
         for content, (page_id, title) in self.wiki.get_texts():
             counter += 1
             if counter % 10000 == 0:
-                print(counter * 10000, "time", time.time() - stamp)
+                print(counter, "time", time.time() - stamp)
                 stamp = time.time()
             yield TaggedDocument([c for c in content], [title])
+        print("Finished counter at", counter)
 
 folder = "data//"
-file = "enwiki-latest-pages-articles.xml.bz2"
-model_name = "big_doc2vec.model"
+file = "enwiki-latest-pages-articles1.xml-p10p30302.bz2"
+model_name = "test_doc2vec.model"
+
+print("Getting WikiCorpus")
 
 wiki = WikiCorpus(folder+file)
 
@@ -29,10 +32,16 @@ documents = TaggedWikiDocument(wiki)
 cores = multiprocessing.cpu_count()
 
 # PV-DBOW 
-model = Doc2Vec(dm=0, dbow_words=1, size=200, window=8, min_count=19, epochs=5, workers=cores)
+model = Doc2Vec(dm=0, dbow_words=1, vector_size=200, window=8, min_count=19, epochs=5, workers=cores)
+
+print("Building vocab")
 
 model.build_vocab(documents)
 
+print("Training model")
+
 model.train(documents, total_examples=model.corpus_count, epochs=model.epochs)
+
+print("Saving model as "+str(model_name))
 
 model.save(model_name)
