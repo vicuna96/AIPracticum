@@ -224,6 +224,8 @@ def init_game():
 
     return id_attrib_dict, source, target
 
+id_attrib_dict, source, target = init_game()
+
 
 """
 
