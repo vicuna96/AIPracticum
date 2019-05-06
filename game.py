@@ -3,21 +3,18 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from termcolor import colored
 from random import random
-import build_graph
+from build_graph import *
+from similarity_algs import *
 
-rand_article_url = 'https://en.wikipedia.org/wiki/Special:Random'
-base_url = 'https://en.wikipedia.org/wiki/'
-prefix_url = '<a href="/wiki/'
-canonical_url = '<link rel="canonical" href="https://en.wikipedia.org/wiki/'
-
-tree = ET.parse('wikipedia-051105-preprocessed/20051105_pages_articles.hgw.xml')
-root = tree.getroot()
-
+# rand_article_url = 'https://en.wikipedia.org/wiki/Special:Random'
+# base_url = 'https://en.wikipedia.org/wiki/'
+# prefix_url = '<a href="/wiki/'
+# canonical_url = '<link rel="canonical" href="https://en.wikipedia.org/wiki/'
 
 class ArticleSearch:
-    def __init__(self, id_number: str, parent = None, relevance = 0):
+    def __init__(self, id_number, parent = None, relevance = 0):
         self.id_number = id_number
-        self.title = #get title from id
+        self.title = id_attrib_dict[id_number]['title']
         self.parent = parent
         self.relevance = relevance
     def get_title(self):
@@ -81,7 +78,7 @@ def get_top_links(article, goal, n):
     article_url = 'https://en.wikipedia.org/wiki/' + article.title
     article_contents = (urllib.request.urlopen(article_url).read(100000000)).decode('utf-8')
     return get_top_links_from_contents(article_contents, goal, n)
-
+"""
 def print_lineage(end):
     lineage = []
     while end is not None:
@@ -90,6 +87,7 @@ def print_lineage(end):
     lineage.reverse()
     print('lineage:', lineage)
 
+"""
 #NOT used for priority beam search
 def bfs_search(start, end):
     S = []
@@ -144,7 +142,7 @@ def itdeep_search(start, end):
 """
 
 #Priority beam search function
-def priority_beam_search(start_id, end_id, width):
+def priority_beam_search(start_id, end_id, width, metric):
         total_checked = 0
         start = ArticleSearch(start_id)
         end = ArticleSearch(end_id)
@@ -157,22 +155,20 @@ def priority_beam_search(start_id, end_id, width):
             if v.id_number == end_id:
                 print_lineage(v)
                 return
-            curr_links = build_graph.links_by_cosim(root, v.id_number)
+            curr_links = links_by_sim(id_attrib_dict, v.id_number, end_id, metric)
             print('currently checking children of', v.title)
-            for i in range(width):
+            for i in range(min(width, len(curr_links))):
                 l = curr_links[i]
-                if l.id_number not in discovered:
+                if l not in discovered:
                     total_checked += 1
-                    discovered.append(l.id_number)
-                    if l.id_number == end_id:
-                        l_article = ArticleSearch(l.id_number, parent = v)
+                    discovered.append(l)
+                    if l == end_id:
+                        l_article = ArticleSearch(l, parent = v)
                         print_lineage(l_article)
                         print('Total checked:', total_checked)
                         return
-                    l_article = ArticleSearch(l.id_number, parent = v)
+                    l_article = ArticleSearch(l, parent = v)
                     S.append(l_article)
-
-
 
 
 """
@@ -218,6 +214,16 @@ def play_game():
     print('End Article:', end_article_title)
 
     prompt_step(start_article, end_article)
+
+def init_game():
+    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]
+    id_attrib_dict = load_data(pickle_path_list)
+
+    source = random_id_generator(id_attrib_dict)
+    target = random_id_generator(id_attrib_dict)
+
+    return id_attrib_dict, source, target
+
 
 """
 
