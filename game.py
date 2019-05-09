@@ -142,7 +142,7 @@ def itdeep_search(start, end):
 """
 
 #Priority beam search function
-def priority_beam_search(start_id, end_id, width, metric):
+def priority_beam_search(start_id, end_id, width, metric, optional=None):
         total_checked = 0
         start = ArticleSearch(start_id)
         end = ArticleSearch(end_id)
@@ -155,8 +155,8 @@ def priority_beam_search(start_id, end_id, width, metric):
             if v.id_number == end_id:
                 print_lineage(v)
                 return
-            curr_links = links_by_sim(id_attrib_dict, v.id_number, end_id, metric)
-            print('currently checking children of', v.title)
+            curr_links = links_by_sim(id_attrib_dict, v.id_number, end_id, metric, optional=optional)
+            # print('currently checking children of', v.title)
             for i in range(min(width, len(curr_links))):
                 l = curr_links[i]
                 if l not in discovered:
@@ -216,15 +216,15 @@ def play_game():
     prompt_step(start_article, end_article)
 
 def init_game():
-    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]
+    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,3)]
     id_attrib_dict = load_data(pickle_path_list)
+    tfidf, tfs, id_to_row = calc_tfs(id_attrib_dict)
 
-    source = random_id_generator(id_attrib_dict)
-    target = random_id_generator(id_attrib_dict)
+    return id_attrib_dict, tfidf, tfs, id_to_row
 
-    return id_attrib_dict, source, target
+id_attrib_dict, tfidf, tfs, id_to_row = init_game()
 
-id_attrib_dict, source, target = init_game()
+# priority_beam_search(source, target, 10, tf_idf_cos_sim, optional={'tfs': tfs, 'id_to_row':id_to_row})
 
 
 """
