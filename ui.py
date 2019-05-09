@@ -3,7 +3,6 @@ from game import *
 
 
 app = Flask(__name__)
-id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game()
 
 class Path:
     def __init__(self, s, e):
@@ -13,8 +12,12 @@ class Path:
 
 @app.route('/<string:start_title>_to_<string:end_title>')
 def search(start_title, end_title):
-    start_id = title_to_id[start_title]
-    end_id = title_to_id[end_title]
+    try:
+        start_id = title_to_id[start_title]
+        end_id = title_to_id[end_title]
+    except:
+        start_id = random_id_generator(id_attrib_dict)
+        end_id = random_id_generator(id_attrib_dict)
     lineage = priority_beam_search(start_id, end_id, 10, dummy_sim)
     return render_template('search.html',
                             start=start_title, end=end_title, lineage=lineage)
@@ -36,4 +39,5 @@ def add():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
