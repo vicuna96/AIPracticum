@@ -1,10 +1,15 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__)
 
 class Path:
     def __init__(self, s, e):
         self.start = s
         self.end = e
+
+
+@app.route('/<string:start_title>_to_<string:end_title>')
+def search(start_title, end_title):
+    return render_template('search.html', start=start_title, end=end_title)
 
 
 @app.route('/', methods = ["POST", "GET"])
@@ -18,11 +23,8 @@ def add():
                 start = value
             if key == 'end':
                 end = value
-        return (start, end)
-
-@app.route('/<string:start_title>_to_<string:end_title>')
-def search(start_title, end_title):
-    return render_template('search.html', start=start_title, end=end_title)
+        return redirect(url_for('search', start_title=start, end_title=end))
+        #return render_template('search.html', start=start, end=end)
 
 
 if __name__ == '__main__':
