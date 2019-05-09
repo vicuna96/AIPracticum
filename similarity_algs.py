@@ -6,6 +6,7 @@ def dummy_fun(doc):
     return doc
 
 def calc_tfs(id_attrib_dict):
+    id_to_row = {id_num:index for (id_num, index) in zip(id_attrib_dict.keys(), range(len(id_attrib_dict)))}
     corpus = [id_attrib_dict[id_num]['text'] for id_num in id_attrib_dict]
     tfidf = TfidfVectorizer(
         analyzer='word',
@@ -13,39 +14,36 @@ def calc_tfs(id_attrib_dict):
         preprocessor=dummy_fun,
         token_pattern=None)
     tfs = tfidf.fit_transform(corpus)
-    return tfidf, tfs
+    return tfidf, tfs, id_to_row
 
 """
 Similarity metric #0: dummy metric for control
 """
-def dummy_sim(id_attrib_dict, id1, id2):
+def dummy_sim(id_attrib_dict, id1, id2, optional=None):
     return 0
 
 """
 Similarity metric #1: maximum pairwise word embedding cosine similarity
 """
-def max_pairwise_embedding_sim(id_attrib_dict, id1, id2):
+def max_pairwise_embedding_sim(id_attrib_dict, id1, id2, optional=None):
     raise NotImplementedError
 
 """
 Similarity metric #2: tf-idf cosine similarity
 """
-def tf_idf_cos_sim(id_attrib_dict, id1, id2):
-    try:
-        query_str1 = id_attrib_dict[id1]['text']
-        query_str2 = id_attrib_dict[id2]['text']
-        response1 = tfidf.transform([query_str1])
-        response2 = tfidf.transform([query_str2])
-        return float(cosine_similarity(response1, response2))
-    except:
-        return 0
+def tf_idf_cos_sim(id_attrib_dict, id1, id2, optional=None):
+    tfs = optional['tfs']
+    id_to_row = optional['id_to_row']
+    response1 = tfs[id_to_row[id1]]
+    response2 = tfs[id_to_row[id2]]
+    return float(cosine_similarity(response1, response2))
 
 """
 List of ordered links of current id in order of decreasing similarity based on metric
 """
-def links_by_sim(id_attrib_dict, id_current, id_target, metric):
+def links_by_sim(id_attrib_dict, id_current, id_target, metric, optional=None):
     links = [id_link for id_link in id_attrib_dict[id_current]['links'] if id_link in id_attrib_dict]
-    sims = [metric(id_attrib_dict, id_child, id_target) for id_child in links]
+    sims = [metric(id_attrib_dict, id_child, id_target, optional=optional) for id_child in links]
     inds = np.argsort(sims)
     sorted_links = np.asarray(links)[inds].tolist()
     return sorted_links
