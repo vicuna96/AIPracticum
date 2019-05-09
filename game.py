@@ -216,15 +216,17 @@ def play_game():
     prompt_step(start_article, end_article)
 
 def init_game():
-    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,3)]
+    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]
     id_attrib_dict = load_data(pickle_path_list)
     tfidf, tfs, id_to_row = calc_tfs(id_attrib_dict)
+    title_to_id = create_title_to_id(id_attrib_dict)
 
-    return id_attrib_dict, tfidf, tfs, id_to_row
+    return id_attrib_dict, tfidf, tfs, id_to_row, title_to_id
 
-id_attrib_dict, tfidf, tfs, id_to_row = init_game()
+id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game()
 
 # priority_beam_search(source, target, 10, tf_idf_cos_sim, optional={'tfs': tfs, 'id_to_row':id_to_row})
+# priority_beam_search(source, target, 10, dummy_sim)
 
 
 
