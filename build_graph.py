@@ -1,11 +1,13 @@
 import string
 import nltk
+import math
 import numpy as np
 import xml.etree.ElementTree as ET
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.porter import PorterStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import pickle
+import time
+import random
 
 def stem_tokens(tokens, stemmer):
     stemmed = []
@@ -20,43 +22,60 @@ def tokenize(text):
     stems = stem_tokens(tokens, stemmer)
     return stems
 
-def calc_tfs(corpus):
-    tfidf = TfidfVectorizer(tokenizer=tokenize, stop_words='english')
-    tfs = tfidf.fit_transform(corpus)
-    return tfidf, tfs
+# random id generator for start and end
+def random_id_generator(id_attrib_dict):
+    return random.choice(list(id_attrib_dict))
 
-# def cos_sim(a, B):
-#     print(a.shape, B.shape)
-#     return np.dot(a, B) / (np.linalg.norm(a) * np.linalg.norm(b))
+def get_title_from_id(id_num):
+    return id_attrib_dict[id_num]['title']
 
-def get_cos_sim(query_str, corpus):
-    tfidf, tfs = calc_tfs(corpus)
-    response = tfidf.transform([query_str])
-    return cosine_similarity(response, tfs)
+def preprocess(root):
+    id_attrib_dict = {}
+    l = len(root.findall('page'))
+    count = 0
+    start = time.time()
+    for page in root.findall('page'):
+        count += 1
+        current = time.time()
+        if count % 1000 == 0:
+            print(str(round((current-start)/60, 1)) +' minutes...'+ str(round(count/l * 100, 1)) + '%' + ' done')
+            if count % 100000 == 0:
+                print('pickling at count ' + str(count) + '...')
+                pickle.dump(id_attrib_dict, open('data/id_attrib_dict_' + str(math.ceil(count / 100000)), 'wb'))
+                id_attrib_dict = {}
+        id_num = int(page.attrib['id'])
+        title = page.find('title').text
+        try:
+            links = [int(link) for link in page.find('links').text.split()]
+        except:
+            link = []
+        try:
+            text = tokenize(''.join(page.find('text').itertext()))
+        except:
+            text = []
+        id_attrib_dict[id_num] = {'title':title, 'links':links, 'text':text}
+    pickle.dump(id_attrib_dict, open('data/id_attrib_dict_' + str(math.ceil(count / 100000)), 'wb'))
 
-def find_page_by_id(root, id_n):
-    page = root.find(".//links/..[@id='" + id_n + "']")
-    links = page.find('links').text.split()
-    # title = page.find('title').text
-    text = page.find('text').text
-    print('found page ', id_n)
-    return (links, text)
+def write_data(path):
+    tree = ET.parse(path)
+    root = tree.getroot()
+    print('starting')
+    preprocess(root)
 
-def get_children(root, links):
-    return [find_page_by_id(root, id_n)[1] for id_n in links]
-
-def links_by_cosim(root, id_n):
-    links, text = find_page_by_id(root, id_n)
-    children = get_children(root, links)
-    cosims = get_cos_sim(text, children)
-    inds = np.argsort(cosims)
-    sorted_links = np.asarray(links)[inds].tolist()[0]
-    return sorted_links
+def load_data(path_list):
+    results = {}
+    for path in path_list:
+        print('loading ' + path + '...')
+        d = pickle.load(open(path, 'rb'))
+        results.update(d)
+    return results
 
 if __name__ == '__main__':
-    tree = ET.parse('wikipedia-051105-preprocessed/20051105_pages_articles.hgw.xml')
-    root = tree.getroot()
-    links_by_cosim(root, '309')
+    xml_path = 'wikipedia-051105-preprocessed/20051105_pages_articles.hgw.xml'
+    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]
 
+    # Comment this in if you want to generate the data from scratch
+    # write_data(xmlpath)
 
-corpus = ['This is the first document.','This document is the second document.','And this is the third one.','Is this the first document?']
+    # Comment this in if you want to load the data in
+    # id_attrib_dict = load_data(pickle_path_list)
