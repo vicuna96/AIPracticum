@@ -81,15 +81,15 @@ def get_top_links(article, goal, n):
     article_url = 'https://en.wikipedia.org/wiki/' + article.title
     article_contents = (urllib.request.urlopen(article_url).read(100000000)).decode('utf-8')
     return get_top_links_from_contents(article_contents, goal, n)
-
-def print_lineage(end):
+"""
+def lineage_as_string(end):
     lineage = []
     while end is not None:
         lineage.append(end.get_title())
         end = end.get_parent()
     lineage.reverse()
-    print('lineage:', lineage)
-
+    return ' -> '.join(lineage)
+"""
 #NOT used for priority beam search
 def bfs_search(start, end):
     S = []
@@ -166,9 +166,10 @@ def priority_beam_search(start_id, end_id, width):
                     discovered.append(l.id_number)
                     if l.id_number == end_id:
                         l_article = ArticleSearch(l.id_number, parent = v)
-                        print_lineage(l_article)
+                        lineage = lineage_as_string(l_article)
+                        print(lineage)
                         print('Total checked:', total_checked)
-                        return
+                        return lineage
                     l_article = ArticleSearch(l.id_number, parent = v)
                     S.append(l_article)
 
@@ -219,10 +220,10 @@ def play_game():
 
     prompt_step(start_article, end_article)
 
-"""
+
 
 #play_game()
-
+"""
 bfs_article = ArticleSearch('Breadth-first_search')
 algorithm_article = ArticleSearch('Algorithm')
 baltimore_article = ArticleSearch('Baltimore,_Maryland')
