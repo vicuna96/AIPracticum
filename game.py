@@ -79,13 +79,13 @@ def get_top_links(article, goal, n):
     article_contents = (urllib.request.urlopen(article_url).read(100000000)).decode('utf-8')
     return get_top_links_from_contents(article_contents, goal, n)
 """
-def lineage_as_string(end):
+def lineage(end):
     lineage = []
     while end is not None:
         lineage.append(end.get_title())
         end = end.get_parent()
     lineage.reverse()
-    return ' -> '.join(lineage)
+    return lineage
 """
 #NOT used for priority beam search
 def bfs_search(start, end):
@@ -152,8 +152,10 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
             v = S[0]
             S = S[1:]
             if v.id_number == end_id:
-                print_lineage(v)
-                return
+                lineage = ' -> '.join(lineage(l_article))
+                print(lineage)
+                print('Total checked:', total_checked)
+                return lineage
             curr_links = links_by_sim(id_attrib_dict, v.id_number, end_id, metric, optional=optional)
             # print('currently checking children of', v.title)
             for i in range(min(width, len(curr_links))):
@@ -163,7 +165,7 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
                     discovered.append(l)
                     if l == end_id:
                         l_article = ArticleSearch(l, parent = v)
-                        lineage = lineage_as_string(l_article)
+                        lineage = ' -> '.join(lineage(l_article))
                         print(lineage)
                         print('Total checked:', total_checked)
                         return lineage
