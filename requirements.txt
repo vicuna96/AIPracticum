@@ -1,2 +1,5 @@
 gensim
 spacy
+scikit-learn
+termcolor
+nltk

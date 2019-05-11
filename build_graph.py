@@ -70,6 +70,14 @@ def load_data(path_list):
         results.update(d)
     return results
 
+def create_title_to_id(id_attrib_dict):
+    title_to_id = {}
+    for id_num in id_attrib_dict:
+        title = id_attrib_dict[id_num]['title']
+        title_to_id[title] = id_num
+    return title_to_id
+
+
 if __name__ == '__main__':
     xml_path = 'wikipedia-051105-preprocessed/20051105_pages_articles.hgw.xml'
     pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]

@@ -5,8 +5,7 @@ TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
 
 
-app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-#id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game()
+app = Flask(__name__)
 
 class Path:
     def __init__(self, s, e):
@@ -16,8 +15,12 @@ class Path:
 """
 @app.route('/<string:start_title>_to_<string:end_title>')
 def search(start_title, end_title):
-    start_id = title_to_id[start_title]
-    end_id = title_to_id[end_title]
+    try:
+        start_id = title_to_id[start_title]
+        end_id = title_to_id[end_title]
+    except:
+        start_id = random_id_generator(id_attrib_dict)
+        end_id = random_id_generator(id_attrib_dict)
     lineage = priority_beam_search(start_id, end_id, 10, dummy_sim)
     return render_template('search.html',
                             start=start_title, end=end_title, lineage=lineage)
@@ -54,4 +57,5 @@ def dated_url_for(endpoint, **values):
 # Code above taken from http://flask.pocoo.org/snippets/40/
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
