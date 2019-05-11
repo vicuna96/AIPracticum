@@ -152,10 +152,10 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
             v = S[0]
             S = S[1:]
             if v.id_number == end_id:
-                lineage = ' -> '.join(lineage(l_article))
-                print(lineage)
+                lin = ' -> '.join(lineage(l_article))
+                print(lin)
                 print('Total checked:', total_checked)
-                return lineage
+                return lin
             curr_links = links_by_sim(id_attrib_dict, v.id_number, end_id, metric, optional=optional)
             # print('currently checking children of', v.title)
             for i in range(min(width, len(curr_links))):
@@ -165,11 +165,11 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
                     discovered.append(l)
                     if l == end_id:
                         l_article = ArticleSearch(l, parent = v)
-                        lineage = ' -> '.join(lineage(l_article))
-                        print(lineage)
+                        lin = ' -> '.join(lineage(l_article))
+                        print(lin)
                         print('Total checked:', total_checked)
-                        return lineage
-                    l_article = ArticleSearch(l.id_number, parent = v)
+                        return lin
+                    l_article = ArticleSearch(l, parent = v)
                     S.append(l_article)
 
 
@@ -217,15 +217,18 @@ def play_game():
 
     prompt_step(start_article, end_article)
 
-def init_game():
-    pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]
+def init_game(test=False):
+    if test:
+        pickle_path_list = ['data/id_attrib_dict_test']
+    else:
+        pickle_path_list = ['data/id_attrib_dict_' + str(i) for i in range(1,11)]
     id_attrib_dict = load_data(pickle_path_list)
     tfidf, tfs, id_to_row = calc_tfs(id_attrib_dict)
     title_to_id = create_title_to_id(id_attrib_dict)
 
     return id_attrib_dict, tfidf, tfs, id_to_row, title_to_id
 
-id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game()
+id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game(test = True)
 
 # priority_beam_search(source, target, 10, tf_idf_cos_sim, optional={'tfs': tfs, 'id_to_row':id_to_row})
 # priority_beam_search(source, target, 10, dummy_sim)
