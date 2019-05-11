@@ -39,6 +39,41 @@ def tf_idf_cos_sim(id_attrib_dict, id1, id2, optional=None):
     return float(cosine_similarity(response1, response2))
 
 """
+Similarity metric #3: using spacy's en_core_web_lg model
+"""
+def get_spacy_metric():
+    import spacy
+    nlp = spacy.load("en_core_web_lg")
+    def spc_met(id_attrib_dict, id1, id2, optional=None):
+        title1 = id_attrib_dict[id1]['title']
+        title2 = id_attrib_dict[id2]['title']
+        return nlp(title1).similarity(nlp(title1))
+    return spc_met
+
+"""
+
+Similarity metric #4: using a doc2vec model we trained on 
+Wikipedia using Gensim
+"""
+def get_doc2vec_gensim():
+    from gensim.models.doc2vec import Doc2Vec
+    model = Doc2Vec.load('big_doc2vec.model')
+    cosine = lambda x, y: np.dot(x / np.sum(x ** 2), y / np.sum(y ** 2))
+    def doc2vec_met(id_attrib_dict, id1, id2, optional=None):
+        title1 = id_attrib_dict[id1]['title']
+        try:
+            vec1 = model[title1]
+        except:
+            vec1 = model.infer_vector(title1.split())
+        title2 = id_attrib_dict[id2]['title']
+        try:
+            vec2 = model[title2]
+        except:
+            vec2 = model.infer_vector(title2.split())
+        return lambda x, y : cosine(vec1, vec2)
+    return doc2vec_met
+
+"""
 List of ordered links of current id in order of decreasing similarity based on metric
 """
 def links_by_sim(id_attrib_dict, id_current, id_target, metric, optional=None):
