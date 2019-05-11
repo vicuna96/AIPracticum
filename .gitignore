@@ -1,3 +1,10 @@
 .idea/
 __pycache__/
 .ipynb_checkpoints/
+models/big_doc2vec.model
+models/big_doc2vec.model.docvecs.vectors_docs.npy
+models/big_doc2vec.model.trainables.syn1neg.npy
+models/big_doc2vec.model.wv.vectors.npy
+data.zip
+data/
+enwiki-latest*
