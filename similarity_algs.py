@@ -47,7 +47,7 @@ def get_spacy_metric():
     def spc_met(id_attrib_dict, id1, id2, optional=None):
         title1 = id_attrib_dict[id1]['title']
         title2 = id_attrib_dict[id2]['title']
-        return nlp(title1).similarity(nlp(title1))
+        return nlp(title1).similarity(nlp(title2))
     return spc_met
 
 """
