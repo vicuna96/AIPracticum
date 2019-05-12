@@ -36,7 +36,7 @@ def tf_idf_cos_sim(id_attrib_dict, id1, id2, optional=None):
     id_to_row = optional['id_to_row']
     response1 = tfs[id_to_row[id1]]
     response2 = tfs[id_to_row[id2]]
-    return float(cosine_similarity(response1, response2))
+    return cosine_similarity(response1, response2)[0,0]
 
 """
 Similarity metric #3: using spacy's en_core_web_lg model
@@ -55,22 +55,23 @@ def get_spacy_metric():
 Similarity metric #4: using a doc2vec model we trained on 
 Wikipedia using Gensim
 """
-def get_doc2vec_gensim():
+def get_doc2vec_gensim(id_attrib_dict, target):
     from gensim.models.doc2vec import Doc2Vec
     model = Doc2Vec.load('models/big_doc2vec.model')
+    doc2 = id_attrib_dict[target]
+    try:
+        vec2 = model[doc2['title']]
+    except:
+        vec2 = model.infer_vector(doc2['text'])
+    vec2 = vec2 / np.sum( vec2 ** 2)
     def doc2vec_met(id_attrib_dict, id1, id2, optional=None):
-        title1 = id_attrib_dict[id1]['title']
+        doc1 = id_attrib_dict[id1]
         try:
-            vec1 = model[title1]
+            vec1 = model[doc1['title']]
         except:
-            vec1 = model.infer_vector(title1.split())
-        title2 = id_attrib_dict[id2]['title']
-        try:
-            vec2 = model[title2]
-        except:
-            vec2 = model.infer_vector(title2.split())
+            print("Document 1 not found",doc1['title'])
+            vec1 = model.infer_vector(doc1['text'])
         vec1 = vec1 / np.sum( vec1 ** 2)
-        vec2 = vec2 / np.sum( vec2 ** 2)
         return np.dot(vec1, vec2)
     return doc2vec_met
 
@@ -79,9 +80,11 @@ List of ordered links of current id in order of decreasing similarity based on m
 """
 def links_by_sim(id_attrib_dict, id_current, id_target, metric, optional=None):
     links = [id_link for id_link in id_attrib_dict[id_current]['links'] if id_link in id_attrib_dict]
+    print("Unsorted", [id_attrib_dict[id]['title'] for id in links])
     sims = [metric(id_attrib_dict, id_child, id_target, optional=optional) for id_child in links]
     inds = np.argsort(sims)
-    sorted_links = np.asarray(links)[inds].tolist()
+    sorted_links = np.asarray(links)[inds[::-1]].tolist()
+    print("Sorted", [id_attrib_dict[id]['title'] for id in sorted_links])
     return sorted_links
 
 if __name__ == '__main__':
