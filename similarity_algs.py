@@ -57,8 +57,7 @@ Wikipedia using Gensim
 """
 def get_doc2vec_gensim():
     from gensim.models.doc2vec import Doc2Vec
-    model = Doc2Vec.load('big_doc2vec.model')
-    cosine = lambda x, y: np.dot(x / np.sum(x ** 2), y / np.sum(y ** 2))
+    model = Doc2Vec.load('models/big_doc2vec.model')
     def doc2vec_met(id_attrib_dict, id1, id2, optional=None):
         title1 = id_attrib_dict[id1]['title']
         try:
@@ -70,7 +69,9 @@ def get_doc2vec_gensim():
             vec2 = model[title2]
         except:
             vec2 = model.infer_vector(title2.split())
-        return lambda x, y : cosine(vec1, vec2)
+        vec1 = vec1 / np.sum( vec1 ** 2)
+        vec2 = vec2 / np.sum( vec2 ** 2)
+        return np.dot(vec1, vec2)
     return doc2vec_met
 
 """
