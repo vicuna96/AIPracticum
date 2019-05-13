@@ -13,6 +13,11 @@ p {
     font-size: 48pt;
 }
 
+h2 {
+    color: rgba(255,0,0,0.5);
+    font-size: 40pt;
+}
+
 input[type = "text"] {
     -webkit-appearance: none;
     width: 600px;
@@ -30,7 +35,7 @@ input[type = "text"] {
 
 input[type = "submit"] {
     -webkit-appearance: none;
-    width:300px;
+    width:350px;
     height:80px;
     font-size: 48px;
     font-family: 'Geneva';

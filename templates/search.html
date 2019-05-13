@@ -1,16 +1,8 @@
 <!doctype html>
 <title>{% block title %}{% endblock %} Path </title>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
-<nav>
-  <h1>Path from <br>{{start}} <br>to <br>{{end}}</h1>
-  <h2>{{lineage}}</h2>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
+<h1>Path from <br>{{start}} to {{end}}</h1>
+<h2>{{lineage}}</h2>
+<form name="new_search" method = "POST">
+    <p><input type = "submit" value = "Search again" /></p>
+</form>

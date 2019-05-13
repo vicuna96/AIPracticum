@@ -13,17 +13,20 @@ class Path:
         self.end = e
 
 
-@app.route('/<string:start_title>_to_<string:end_title>')
+@app.route('/<string:start_title>_to_<string:end_title>', methods = ['POST', 'GET'])
 def search(start_title, end_title):
-    try:
-        start_id = title_to_id[start_title]
-        end_id = title_to_id[end_title]
-    except:
-        start_id = random_id_generator(id_attrib_dict)
-        end_id = random_id_generator(id_attrib_dict)
-    lineage = priority_beam_search(start_id, end_id, 10, dummy_sim)
-    return render_template('search.html',
-                            start=start_title, end=end_title, lineage=lineage)
+    if request.method == 'GET':
+        try:
+            start_id = title_to_id[start_title]
+            end_id = title_to_id[end_title]
+        except:
+            start_id = random_id_generator(id_attrib_dict)
+            end_id = random_id_generator(id_attrib_dict)
+        lineage = priority_beam_search(start_id, end_id, 10, dummy_sim)
+        return render_template('search.html',
+                                start=start_title, end=end_title, lineage=lineage)
+    if request.method == 'POST':
+        return redirect(url_for('add'))
 
 
 @app.route('/', methods = ["POST", "GET"])
@@ -37,8 +40,11 @@ def add():
                 start = value
             if key == 'end':
                 end = value
+        if start == "":
+            start = "Wikipedia"
+        if end == "":
+            end = "Game"
         return redirect(url_for('search', start_title=start, end_title=end))
-        #return render_template('search.html', start=start, end=end)
 
 # Code below taken from http://flask.pocoo.org/snippets/40/
 # Necessary since css file was not updating properly

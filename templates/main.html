@@ -3,7 +3,7 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css')}}">
 
 <h1>Wiki Game Path Finder</h1>
-<form name="new_search" method = "POST" action="{{ url_for('add') }}">
+<form name="send_search" method = "POST" action="{{ url_for('add') }}">
     <p>Start Article <input type = "text" id = "s" name = "start" value={{request.form.start}}></p>
     <p>End Article <input type = "text" id = "e" name = "end" value={{request.form.end}}></p>
     <p><input type = "submit" value = "Find a path!" /></p>
