@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for
 import os
-#from game import *
+from game import *
+
 TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
 
@@ -12,7 +13,6 @@ class Path:
         self.start = s
         self.end = e
 
-"""
 @app.route('/<string:start_title>_to_<string:end_title>')
 def search(start_title, end_title):
     try:
@@ -24,7 +24,6 @@ def search(start_title, end_title):
     lineage = priority_beam_search(start_id, end_id, 10, dummy_sim)
     return render_template('search.html',
                             start=start_title, end=end_title, lineage=lineage)
-"""
 
 @app.route('/', methods = ["POST", "GET"])
 def add():

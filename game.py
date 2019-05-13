@@ -228,7 +228,7 @@ def init_game(test=False):
 
     return id_attrib_dict, tfidf, tfs, id_to_row, title_to_id
 
-id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game(test = True)
+id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game(test = False)
 
 # priority_beam_search(source, target, 10, tf_idf_cos_sim, optional={'tfs': tfs, 'id_to_row':id_to_row})
 # priority_beam_search(source, target, 10, dummy_sim)
