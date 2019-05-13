@@ -165,7 +165,7 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
                     discovered.append(l)
                     if l == end_id:
                         l_article = ArticleSearch(l, parent = v)
-                        lin = ' -> '.join(lineage(l_article))
+                        lin = ' --> '.join(lineage(l_article))
                         print(lin)
                         print('Total checked:', total_checked)
                         return lin
@@ -217,7 +217,7 @@ def play_game():
 
     prompt_step(start_article, end_article)
 
-def init_game(test=False):
+def init_game(test=True):
     if test:
         pickle_path_list = ['data/id_attrib_dict_test']
     else:

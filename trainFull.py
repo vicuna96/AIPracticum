@@ -19,9 +19,9 @@ class TaggedWikiDocument(object):
             yield TaggedDocument([c for c in content], [title])
         print("Finished counter at", counter)
 
-folder = "data//"
-file = "enwiki-latest-pages-articles1.xml-p10p30302.bz2"
-model_name = "test_doc2vec.model"
+folder = ""
+file = "enwiki-latest-pages-articles-april23.xml.bz2"
+model_name = "big_doc2vec.model"
 
 print("Getting WikiCorpus")
 
@@ -45,3 +45,5 @@ model.train(documents, total_examples=model.corpus_count, epochs=model.epochs)
 print("Saving model as "+str(model_name))
 
 model.save(model_name)
+
+print("Model saved")
