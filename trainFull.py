@@ -4,6 +4,11 @@ import multiprocessing
 import numpy as np
 import time
 
+"""
+Influenced by the Gensim tutorial for Doc2Vec - Wikipedia
+https://github.com/RaRe-Technologies/gensim/tree/develop/docs/notebooks
+"""
+
 class TaggedWikiDocument(object):
     def __init__(self, wiki):
         self.wiki = wiki
