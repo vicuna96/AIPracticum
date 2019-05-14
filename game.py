@@ -155,7 +155,7 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
                 lin = ' -> '.join(lineage(l_article))
                 print(lin)
                 print('Total checked:', total_checked)
-                return lin
+                return total_checked, lineage(l_article)
             curr_links = links_by_sim(id_attrib_dict, v.id_number, end_id, metric, optional=optional)
             # print('currently checking children of', v.title)
             for i in range(min(width, len(curr_links))):
@@ -168,7 +168,7 @@ def priority_beam_search(start_id, end_id, width, metric, optional=None):
                         lin = ' --> '.join(lineage(l_article))
                         print(lin)
                         print('Total checked:', total_checked)
-                        return lin
+                        return total_checked, lineage(l_article)
                     l_article = ArticleSearch(l, parent = v)
                     S.append(l_article)
 
@@ -232,6 +232,26 @@ id_attrib_dict, tfidf, tfs, id_to_row, title_to_id = init_game(test = False)
 
 # priority_beam_search(source, target, 10, tf_idf_cos_sim, optional={'tfs': tfs, 'id_to_row':id_to_row})
 # priority_beam_search(source, target, 10, dummy_sim)
+
+paths = [('Jesus', 'Volkswagen'), ('Toothpaste', 'William Shakespeare'), ('Puppy', 'Racism'), ('Pants', 'Shirt'), ('Elmo', 'Teletubbies'), ('Apple pie', 'Rock (geology)'), ('Here', 'There'), ('Oboe', 'Veto'), ('Satyr', 'Wombat'), ('Locust', 'Bicycle')]
+
+spc_met = get_spacy_metric()
+
+def eval_func(paths):
+    total_checked = []
+    lineage_list = []
+    for source_title, target_title in paths:
+        source = title_to_id[source_title]
+        target = title_to_id[target_title]
+        print(source_title, target_title)
+        total_checked_0, lin_0 = priority_beam_search(source, target, float('inf'), dummy_sim)
+        total_checked_1, lin_1 = priority_beam_search(source, target, 10, tf_idf_cos_sim, optional={'tfs': tfs, 'id_to_row':id_to_row})
+        total_checked_2, lin_2 = priority_beam_search(source, target, float('inf'), spc_met)
+        total_checked.append((total_checked_0, total_checked_1, total_checked_2))
+        lineage_list.append((lin_0, lin_1, lin_2))
+    return total_checked, lineage_list
+
+# total_checked, lineage_list = eval_func(paths)
 
 
 
