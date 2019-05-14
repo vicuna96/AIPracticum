@@ -1,0 +1,8 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} Path </title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+<h1>Path from <br>{{start}} to {{end}}</h1>
+<h2>{{lineage}}</h2>
+<form name="new_search" method = "POST">
+    <p><input type = "submit" value = "Search again" /></p>
+</form>

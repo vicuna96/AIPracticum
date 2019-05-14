@@ -1,0 +1,58 @@
+h1 {
+    font-size: 64pt;
+    border-bottom: 2px solid rgba(255,0,0,0.5);
+}
+h1, p {
+    color: rgba(14, 150, 230, 0.75);
+    font-family: 'Georgia', serif;
+    text-align: center;
+    margin: 0;
+}
+
+p {
+    font-size: 48pt;
+}
+
+h2 {
+    color: rgba(255,0,0,0.5);
+    font-size: 40pt;
+}
+
+input[type = "text"] {
+    -webkit-appearance: none;
+    width: 600px;
+    height:80px;
+    font-size: 48px;
+    font-family: 'Geneva';
+    border-radius: 5px;
+    color: rgba(255,0,0,0.5);
+    margin-top: 50px;
+}
+
+#e {
+    margin-left: 20px;
+}
+
+input[type = "submit"] {
+    -webkit-appearance: none;
+    width:350px;
+    height:80px;
+    font-size: 48px;
+    font-family: 'Geneva';
+    border-radius: 5px;
+    color: rgba(255,0,0,0.5);
+    margin-top: 120px;
+}
+
+#credits {
+    font-size: 18pt;
+    margin-top: 200px;
+    margin-bottom: 50px;
+}
+
+html {
+    height: 100%;
+    background-image: linear-gradient(/*to bottom right,*/ rgba(255,255,0,0.1), rgba(255,255,0,0.6));
+    background-repeat: no-repeat;
+    background-size: auto;
+}
